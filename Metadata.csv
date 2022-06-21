@@ -1,0 +1,100 @@
+Original_ID,New_ID,Date,Nest_name,Locality,Site_name,Family,Genus,species,Gut_portion,Wasp Type
+AmB1,Mel1,Dec,Individual,San Antonio,Rankin,Apidae,Apis,mellifera,whole,Honey Bee
+AmC1,Mel2,Dec,Individual,San Antonio,Rankin,Apidae,Apis,mellifera,whole,Honey Bee
+BFL11,BrachIn1,Jun,Individual,Austin,BFL,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BFL12,BrachIn2,Jun,Individual,Austin,BFL,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BFL14M,BrachIn3,Jun,Individual,Austin,BFL,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BFL15,BrachIn4,Jun,Individual,Austin,BFL,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BFL17,BrachIn5,Jun,Individual,Austin,BFL,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm11D,Brach11,Dec,SA1,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm12D,Brach12,Dec,SA1,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm13D,Brach13,Dec,SA1,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm310,Brach31,Dec,SA3,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm312,Brach32,Dec,SA3,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm313,Brach33,Dec,SA3,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm42D,Brach41,Dec,SA4,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm43D,Brach42,Dec,SA4,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm44D,Brach43,Dec,SA4,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm52,Brach51,Dec,SA5,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm53,Brach52,Dec,SA5,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm55,Brach53,Dec,SA5,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm618,Brach61,Dec,SA6,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm619,Brach62,Dec,SA6,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm62,Brach63,Dec,SA6,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm71D,Brach71,Dec,SA7,San Antonio,IKEA,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm72D,Brach72,Dec,SA7,San Antonio,IKEA,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm73D,Brach73,Dec,SA7,San Antonio,IKEA,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm81D,Brach81,Dec,SA8,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm82D,Brach82,Dec,SA8,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+Bm83D,Brach83,Dec,SA8,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BmA4,Brach14,Dec,SA1,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BmA5,Brach21,Dec,SA2,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BmA7,Brach34,Dec,SA3,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BmA8,Brach44,Dec,SA4,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR11,BrachH11,May,Har1,Harlingen,Church,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR12,BrachH12,May,Har1,Harlingen,Church,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR13,BrachH13,May,Har1,Harlingen,Church,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR14,BrachH14,May,Har1,Harlingen,Church,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR15,BrachH15,May,Har1,Harlingen,Church,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR21,BrachH21,May,Har2,Harlingen,House,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR22,BrachH22,May,Har2,Harlingen,House,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR23,BrachH23,May,Har2,Harlingen,House,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR24,BrachH24,May,Har2,Harlingen,House,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+HAR25,BrachH25,May,Har2,Harlingen,House,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+KV110,BrachK11,Oct,KV1,Kingsville,Kingsville,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+KV114,BrachK12,Oct,KV1,Kingsville,Kingsville,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+KV115H,BrachK13,Oct,KV1,Kingsville,Kingsville,Vespidae,Brachygastra,mellifica,hindgut,Honey Wasp
+KV115M,BrachK14,Oct,KV1,Kingsville,Kingsville,Vespidae,Brachygastra,mellifica,midgut,Honey Wasp
+KV116,BrachK15,Oct,KV1,Kingsville,Kingsville,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+KV16,BrachK16,Oct,KV1,Kingsville,Kingsville,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+PLV11,BrachP11,Jan,PLV1,Port Lavaca,Port Lavaca,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+PLV12,BrachP12,Jan,PLV1,Port Lavaca,Port Lavaca,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+PLV13,BrachP13,Jan,PLV1,Port Lavaca,Port Lavaca,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+PLV15M,BrachP14,Jan,PLV1,Port Lavaca,Port Lavaca,Vespidae,Brachygastra,mellifica,midgut,Honey Wasp
+PLV16,BrachP15,Jan,PLV1,Port Lavaca,Port Lavaca,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BM12J,Brach15,July,SA1,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BM15J,Brach16,July,SA1,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BM21J,Brach22,July,SA2,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BM22J,Brach23,July,SA2,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BM31J,Brach35,July,SA3,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BM35J,Brach36,July,SA3,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BM45J,Brach45,July,SA4,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+BM46J,Brach46,July,SA4,San Antonio,Rankin,Vespidae,Brachygastra,mellifica,whole,Honey Wasp
+JCH620,Vesp1,Apr,Individual,Bastrop,Stengl,Vespidae,Polistes,carolina,whole,Other Wasp
+JCH706,Vesp2,May,Individual,Austin,Brackenridge,Vespidae,Polistes,carolina,whole,Other Wasp
+JCH716,Crab1,May,Individual,Austin,Brackenridge,Crabronidae,Cerceris,fumipennis,whole,Other Wasp
+JCH717,Thynn1,May,Individual,Austin,Brackenridge,Thynnidae,Myzinum,quinquecinctum,whole,Other Wasp
+JCH719,Sphec2,May,Individual,Austin,Brackenridge,Sphecidae,Isodontia,mexicana,whole,Other Wasp
+JCH733,Mut1,May,Individual,Austin,Brackenridge,Mutillidae,Pseudomethoca,athmas,whole,Other Wasp
+JCH745,Vesp3,Jun,Individual,Austin,Hornsby Bend,Vespidae,Polistes,apachus,whole,Other Wasp
+JCH748,Sphec3,Jun,Individual,Austin,Hornsby Bend,Sphecidae,Isodontia,mexicana,whole,Other Wasp
+JCH749,Ich1,Jun,Individual,Austin,Hornsby Bend,Ichneumonidae,Trogomorpha,arrogans,whole,Other Wasp
+JCH753,Vesp17,Jun,Individual,Austin,Hornsby Bend,Vespidae,Polistes,metricus,whole,Other Wasp
+JCH757,Pomp1,Jun,Individual,Austin,Hornsby Bend,Pompilidae,Anoplius,lepidus,whole,Other Wasp
+JCH758,Vesp4,Jun,Individual,Austin,Hornsby Bend,Vespidae,Polistes,apachus,whole,Other Wasp
+JCH759,Vesp5,Jun,Individual,Austin,Hornsby Bend,Vespidae,Polistes,carolina,whole,Other Wasp
+JCH760,Vesp6,Jun,Individual,Austin,Hornsby Bend,Vespidae,Polistes,metricus,whole,Other Wasp
+JCH762,Vesp7,Jun,Individual,Austin,Hornsby Bend,Vespidae,Polistes,dorsalis,whole,Other Wasp
+JCH764,Crab2,Jun,Individual,Austin,Hornsby Bend,Crabronidae,Cerceris,fumipennis,whole,Other Wasp
+JCH792,Vesp8,Jun,Individual,Seguin,Dylans Grandparents,Vespidae,Polistes,carolina,whole,Other Wasp
+JCH794,Vesp10,Jun,Individual,Seguin,Dylans Grandparents,Vespidae,Polistes,carolina,whole,Other Wasp
+JCH795,Vesp11,Jun,Individual,Seguin,Dylans Grandparents,Vespidae,Euodynerus,crypticus,whole,Other Wasp
+JCH796,Sphec4,Jun,Individual,Seguin,Dylans Grandparents,Sphecidae,Chalybion,californicum,whole,Other Wasp
+JCH799,Vesp12,Jun,Individual,Seguin,Dylans Grandparents,Vespidae,Polistes,apachus,whole,Other Wasp
+JCH800,Vesp13,Jun,Individual,Seguin,Dylans Grandparents,Vespidae,Polistes,exclamans,whole,Other Wasp
+JCH802,Crab3,Jun,Individual,Seguin,Dylans Grandparents,Crabronidae,Trypoxylon,texense,whole,Other Wasp
+JCH806,Vesp15,Jul,Individual,Austin,Hornsby Bend,Vespidae,Polistes,apachus,whole,Other Wasp
+JCH814,Scol1,Jul,Individual,Austin,Hornsby Bend,Scoliidae,Trielis,octomaculata,whole,Other Wasp
+JCH815,Vesp16,Jul,Individual,Austin,Hornsby Bend,Vespidae,Parancistrocerus,fulvipes,whole,Other Wasp
+JCH816,Thynn2,Jul,Individual,Austin,Hornsby Bend,Thynnidae,Myzinum,quinquecinctum,whole,Other Wasp
+ASF423,Crab5,Jun,Individual,Austin,Hornsby Bend,Crabronidae,Trypoxylon,texense,unknown ,Other Wasp
+ASF611,Crab7,Jun,Individual,Austin,Hornsby Bend,Crabronidae,Trypoxylon,texense,unknown ,Other Wasp
+ASF760,Mut2,August,Individual,Austin,Hornsby Bend,Mutillidae,Dasymutilla,species,unknown ,Other Wasp
+ASF793,Pomp2,August,Individual,Austin,Hornsby Bend,Pompilidae,Anoplius,species,unknown ,Other Wasp
+ASF465,Sphec5,Jun,Individual,Bandera,Bandera,Sphecidae,Sceliphron,caementarium,unknown ,Other Wasp
+ASF471,Sphec6,Jun,Individual,Bandera,Bandera,Sphecidae,Sceliphron,caementarium,unknown ,Other Wasp
+AMP-A1,BrachA1,Sept,Individual,Austin,Austin Memorial Park,Vespidae,Brachygastra,mellifica,unknown ,Honey Wasp
+AMP-A2,BrachA2,Sept,Individual,Austin,Austin Memorial Park,Vespidae,Brachygastra,mellifica,unknown ,Honey Wasp
+AMP-A3,BrachA3,Sept,Individual,Austin,Austin Memorial Park,Vespidae,Brachygastra,mellifica,unknown ,Honey Wasp
+AMP-A4,BrachA4,Sept,Individual,Austin,Austin Memorial Park,Vespidae,Brachygastra,mellifica,unknown ,Honey Wasp
+AMP-A5,BrachA5,Sept,Individual,Austin,Austin Memorial Park,Vespidae,Brachygastra,mellifica,unknown ,Honey Wasp
