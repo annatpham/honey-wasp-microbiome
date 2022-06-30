@@ -20,7 +20,7 @@ fnFs[1:3]
 fnRs[1:3]
 
 #Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
-  sample.names <-sapply(strsplit(basename(fnFs), "_"), `[`,1)
+sample.names <-sapply(strsplit(basename(fnFs), "_"), `[`,1)
 
 #Visualize the quality profiles of the forward reads
 plotQualityProfile(fnFs[1:2])
@@ -143,25 +143,29 @@ tax$Sequence = rownames(tax) # Make a Sequence column
 tax_table(ps) <- as.matrix(tax) # Replace with new taxonomy table
 taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps))) # Make short names for ASVs
 
+#Remove samples with few reads
+toRemove <- c("Pomp1", "Pomp2", "Sphec3", "Crab3", "Scol1", "Sphec6", "Sphec5") 
+ps.remove <- prune_samples(!sample_names(ps) %in% toRemove, ps) # New ps object
+
 #Using Decontam Package
 BiocManager::install("decontam")
 library(decontam); packageVersion("decontam")
 
 ##Inspect library size
-df <- as.data.frame(sample_data(ps)) #Put sample_data into a ggplot-friendly data.frame
-df$LibrarySize <- sample_sums(ps)
+df <- as.data.frame(sample_data(ps.remove)) #Put sample_data into a ggplot-friendly data.frame
+df$LibrarySize <- sample_sums(ps.remove)
 df <- df[order(df$LibrarySize),]
 df$Index <- seq(nrow(df))
 ggplot(data=df, aes(x=Index, y=LibrarySize, color=Sample_or_Control)) + geom_point()
 
 ##Identify contaminants using prevalence method
-sample_data(ps)$is.neg <- sample_data(ps)$Sample_or_Control == "Control"
+sample_data(ps.remove)$is.neg <- sample_data(ps.remove)$Sample_or_Control == "Control"
 ###Using the conservative threshold of 0.5
-contamdf.prev05 <- isContaminant(ps, method="prevalence", neg="is.neg", threshold=0.5)
+contamdf.prev05 <- isContaminant(ps,remove, method="prevalence", neg="is.neg", threshold=0.5)
 table(contamdf.prev05$contaminant)
 ###Number of times taxa were observed in neg controls and samples
 #Make phyloseq object of presence-absence in neg controls and samples
-ps.pa <- transform_sample_counts(ps, function(abund) 1*(abund>0))
+ps.pa <- transform_sample_counts(ps.remove, function(abund) 1*(abund>0))
 ps.pa.neg <- prune_samples(sample_data(ps.pa)$Sample_or_Control == "Control", ps.pa)
 ps.pa.pos <- prune_samples(sample_data(ps.pa)$Sample_or_Control == "Sample", ps.pa)
 #Make data.frame of prevalence in positive and negative samples
@@ -172,7 +176,7 @@ ggplot(data=df.pa, aes(x=pa.neg, y=pa.pos, color=contaminant)) + geom_point() +
 write.csv(contamdf.prev05, "contamdf.csv") # True/false contaminant classification data frame
 
 #Remove chloroplast, mitochondria, and unassigned phyla
-ps1 <- subset_taxa(ps, !is.na(Phylum) & !Phylum %in% c("", "uncharacterized"))
+ps1 <- subset_taxa(ps.remove, !is.na(Phylum) & !Phylum %in% c("", "uncharacterized"))
 filterorder = c("Chloroplast")
 filterfamily = c("Mitochondria")
 ps1 = subset_taxa(ps1, !Order %in% filterorder) 
@@ -202,9 +206,9 @@ library(genefilter)
 library(vegan)
 microbe <- filter_taxa(ps.clean, filterfun(kOverA(2, 2)), TRUE) # New ps object
 
-ps.clean.sum <-sample_sums(ps.clean)
-microbe.sum <-sample_sums(microbe)
-filter1 <-microbe.sum/ps.clean.sum
+ps.clean.sum <- sample_sums(ps.clean)
+microbe.sum <- sample_sums(microbe)
+filter1 <- microbe.sum/ps.clean.sum
 filterdf <- data.frame(filter1)
 
 #Merge taxonomy and ASV table
@@ -212,6 +216,7 @@ taxtab.microbe <- data.frame(tax_table(microbe))
 seqtab.microbe <- data.frame(t(otu_table(microbe))) 
 merge.microbe <- merge(seqtab.microbe, taxtab.microbe, by="row.names", all = FALSE)
 write.csv(merge.microbe, "./merge.microbe.csv")
+
 
 
 ############################# Old Code ######################################
