@@ -1,17 +1,14 @@
-###MOST RECENT AS OF June 2021
-
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
-
 BiocManager::install("dada2")
 
 getwd()
-setwd("/Users/lexiemartin/Desktop")
+setwd("C:/Users/apham/Documents") #setwd("/Users/lexiemartin/Desktop")
 
-library(dada2)
+library(dada2); packageVersion("dada2")
 #Getting to the files
 #They should all be in a folder on the computer, set the "path" to be the path get to  the files
-mypath <- "/Users/lexiemartin/Desktop/5 April 2022 Files"
+mypath <- "./5 April 2022 Files"
 list.files(mypath) #check to see all the files are there
 
 #Forward and reverse fastq filenames are in the format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
@@ -22,8 +19,8 @@ fnRs <- sort(list.files(mypath, pattern = "_R2_001.fastq", full.names = TRUE))
 fnFs[1:3]
 fnRs[1:3]
 
-#Extrat sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
-sample.names <-sapply(strsplit(basename(fnFs), "_"), `[`,1)
+#Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
+  sample.names <-sapply(strsplit(basename(fnFs), "_"), `[`,1)
 
 #Visualize the quality profiles of the forward reads
 plotQualityProfile(fnFs[1:2])
@@ -37,25 +34,23 @@ myfilt_path <-file.path(mypath, "filtered") #place filtered files in filtered/su
 if(!file_test("-d", myfilt_path)) dir.create(myfilt_path)
 filtFs <- file.path(mypath, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
 filtRs <- file.path(mypath, "filtered",paste0(sample.names, "_R_filt_fastq.gz"))
-names(filtFs) <-sample.names
-names(filtRs) <-sample.names
+
+#Adapters already removed by GSAF
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(230,240), trimLeft= c(19, 20),
                      maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
-                     compress=TRUE, multithread=TRUE) #If getting an error message, make sure the file names are in the same format as the example
+                     compress=TRUE, multithread=FALSE) 
+#On Mac set multithread=TRUE  
 head(out)
-
 
 ##Infer Sequence Variants
 #Dereplication
 #depreplication combines all identical sequencing reads into "unique sequences" with a corresponding "abundance": the # of reads with that unique sequence
 #reduces computation time by eliminating redundant comparisons
 derepFs <- derepFastq(filtFs, verbose = TRUE)
-
 derepRs <- derepFastq(filtRs, verbose = TRUE)
-#name the derep-calss objects by the sample names 
+#name the derep-class objects by the sample names 
 names(derepFs) <- sample.names
 names(derepRs) <- sample.names
-
 
 #Error Rates
 errF <-learnErrors(filtFs, multithread=TRUE)
@@ -72,11 +67,15 @@ dadaFs[[1]]
 
 #Merge paired reads
 mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs)
-seqtabAll <-makeSequenceTable(mergers[!grepl("Mock", names(mergers))])
+
+#Create ASV table
+seqtabAll <- makeSequenceTable(mergers[!grepl("Blank", "qblnk1", "qblnk2", names(mergers))])
+dim(seqtabAll)
 table(nchar(getSequences(seqtabAll)))
 
 #Remove Chimeras
 seqtabNoC <- removeBimeraDenovo(seqtabAll)  
+
 # Track read counts through pipeline
 getN <- function(x) sum(getUniques(x)) # Function to get unique reads
 track <- 
@@ -89,19 +88,17 @@ colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "n
 rownames(track) <- sample.names
 head(track)
 
-getwd()
-setwd("/Users/lexiemartin/Desktop/5 April 2022 Files/filtered")
+#Download as a data frame
+dada2df <- data.frame(track) 
+write.csv(dada2df, "./dada2df.csv") 
+
 # Assign taxonomy
 fastaRef <- "./silva_nr99_v138.1_train_set.fa.gz"
-taxTab <- assignTaxonomy(seqtabNoC, refFasta = fastaRef, multithread=TRUE) #If you are gettin an error message here, set your formal working directory to be your filtered folder
+taxTab <- assignTaxonomy(seqtabNoC, refFasta = fastaRef, multithread=TRUE)
 unname(head(taxTab))
 
 ## to install DECIPHER and phyloseq
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-
 BiocManager::install("DECIPHER")
-
 BiocManager::install("phyloseq")
 
 #installing packages
@@ -113,7 +110,6 @@ install.packages("gridExtra")
 library("gridExtra")
 library(DECIPHER)
 library(phyloseq)
-library(dada2)
 
 #Construct Phylogenetic Tree
 seqs <- getSequences(seqtabNoC)
@@ -130,61 +126,95 @@ fitGTR
 
 #Combine data into a  phyloseq object
 ##duplicates were manually removed in excel because the code was not working
-###honey <- read.csv(file = "honeywaspdata.csv")
 ###honey$sample.id <- paste0(gsub("", "", honey$sample.id), "D", honey$Gut_portion)
 ###honey <- honey[!duplicated(honey$sample.id),] # Remove dupicate entries for reverse reads
-setwd("/Users/lexiemartin/Desktop") #reset  your working directory to wherever the files are
-honey <- read.csv(file = "5April2022Meta.csv")
+honey <- read.csv(file = "Metadata.csv")
 rownames(honey) <- honey$New_ID
 all(rownames(seqtabNoC) %in% honey$New_ID) # TRUE
-keep.cols <- c("Sample_ID", "Year", "Date", "Nest_name", "Locality", "Site_name", "ID", "Genus", "Species", "Gut_portion")
 ps <- phyloseq(otu_table(seqtabNoC, taxa_are_rows=FALSE), 
                sample_data(honey), 
-               tax_table(taxTab),phy_tree(fitGTR$tree))
+               tax_table(taxTab),
+               phy_tree(fitGTR$tree))
 ps
 
-#Saving phyloseq objects
-BiocManager::install("microbiome")
-library(microbiome)
-write_phyloseq(ps) #must go to the downloads folder and rename the files everytime so they don't get overridden
-write_phyloseq(taxTab)
-write_phyloseq(seqtabAll)
-write_phyloseq(seqtabNoC)
+#Make short names for ASVs while storing sequence in a new column
+tax <- data.frame(tax_table(ps))
+tax$Sequence = rownames(tax) # Make a Sequence column
+tax_table(ps) <- as.matrix(tax) # Replace with new taxonomy table
+taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps))) # Make short names for ASVs
 
-#Post-filtering
+#Using Decontam Package
+BiocManager::install("decontam")
+library(decontam); packageVersion("decontam")
 
-##Taxonomic Filtering 
-#rank_names(ps) #shows available ranks in the dataset
-### Create table, number of features for each phyla
-#table(tax_table(ps)[, "Phylum"], exclude = NULL)
-###Removes unclassified phyla
-#ps <- subset_taxa(ps, !is.na(Phylum) & !Phylum %in% c("", "uncharacterized"))
-### Compute prevalence of each feature, store as data.frame
-#prevdf = apply(X = otu_table(ps),
-               MARGIN = ifelse(taxa_are_rows(ps), yes = 1, no = 2),
-               FUN = function(x){sum(x > 0)})
-### Add taxonomy and total read counts to this data.frame
-#prevdf = data.frame(Prevalence = prevdf,
-                    TotalAbundance = taxa_sums(ps),
-                    tax_table(ps))
-###Average Prevelances
-#plyr::ddply(prevdf, "Phylum", function(df1){cbind(mean(df1$Prevalence),sum(df1$Prevalence))})
-### Define phyla to filter
-#filterPhyla = c("Actinobacteria","Bacteriodetes", "Firmicutes", "Proteobaceteria","Acidobacteria","Armatimonadetes","BRC1","candidate_division_WPS-1","Candidatus_Saccharibacteria",
-                #"Chloroflexi", "Crenarchaeota", "Cyanobacteria/Chloroplast", "Deinococcus-Thermus","Euryarchaeota", 
-                #"Fusobacteria","Gemmatimonadetes", "Nitrospirae", "Planctomycetes", "Tenericutes",
-                #"Thaumarchaeota","Verrucomicrobia", "Woesearchaeota")
-#filterPhyla = c("Abditibacteriota", "Acidobacteriota", "Armatimonadota", "Bdellovibrionota", "Campylobacterota", "Chloroflexi", "Crenarchaeota", "Cyanobacteria", "Deinococcota", "Desulfobacterota", "Fusobacteriota", "Gemmatimonadota", "Myxococcota", "Patescibacteria","Planctomycetota", "SAR324 clade(Marine group B)", "Sumerlaeota", "Verrucomicrobiota") #silva v. 138.1
+##Inspect library size
+df <- as.data.frame(sample_data(ps)) #Put sample_data into a ggplot-friendly data.frame
+df$LibrarySize <- sample_sums(ps)
+df <- df[order(df$LibrarySize),]
+df$Index <- seq(nrow(df))
+ggplot(data=df, aes(x=Index, y=LibrarySize, color=Sample_or_Control)) + geom_point()
+
+##Identify contaminants using prevalence method
+sample_data(ps)$is.neg <- sample_data(ps)$Sample_or_Control == "Control"
+###Using the conservative threshold of 0.5
+contamdf.prev05 <- isContaminant(ps, method="prevalence", neg="is.neg", threshold=0.5)
+table(contamdf.prev05$contaminant)
+###Number of times taxa were observed in neg controls and samples
+#Make phyloseq object of presence-absence in neg controls and samples
+ps.pa <- transform_sample_counts(ps, function(abund) 1*(abund>0))
+ps.pa.neg <- prune_samples(sample_data(ps.pa)$Sample_or_Control == "Control", ps.pa)
+ps.pa.pos <- prune_samples(sample_data(ps.pa)$Sample_or_Control == "Sample", ps.pa)
+#Make data.frame of prevalence in positive and negative samples
+df.pa <- data.frame(pa.pos=taxa_sums(ps.pa.pos), pa.neg=taxa_sums(ps.pa.neg),
+                    contaminant=contamdf.prev05$contaminant)
+ggplot(data=df.pa, aes(x=pa.neg, y=pa.pos, color=contaminant)) + geom_point() +
+  xlab("Prevalence (Negative Controls)") + ylab("Prevalence (Samples)")
+write.csv(contamdf.prev05, "contamdf.csv") # True/false contaminant classification data frame
+
+#Remove chloroplast, mitochondria, and unassigned phyla
+ps1 <- subset_taxa(ps, !is.na(Phylum) & !Phylum %in% c("", "uncharacterized"))
 filterorder = c("Chloroplast")
 filterfamily = c("Mitochondria")
-### Filter entries with unidentified Phylum.
-ps1 = subset_taxa(ps, !Order %in% filterorder) 
-ps2 = subset_taxa(ps1, !Family %in% filterfamily)
+ps1 = subset_taxa(ps1, !Order %in% filterorder) 
+ps1 = subset_taxa(ps1, !Family %in% filterfamily) # New ps object
+
+#Remove ASVs classified as contaminants
+contamTaxa = c("ASV9", "ASV17", "ASV21", "ASV39", "ASV55", "ASV104", "ASV125", 
+               "ASV127", "ASV272", "ASV408", "ASV590", "ASV1324", "ASV1532")
+allTaxa = taxa_names(ps1)
+allTaxa <- allTaxa[!(allTaxa %in% contamTaxa)] # Remove contamTaxa from allTaxa
+ps.clean = prune_taxa(allTaxa, ps1) # New ps object
+
+#Make ASV, taxonomy, and read table of contaminants
+ps.contam = prune_taxa(contamTaxa, ps1)
+taxtab.contam <- data.frame(tax_table(ps.contam))
+seqtab.contam <- data.frame(t(otu_table(ps.contam))) 
+merge.contam <- merge(seqtab.contam, taxtab.contam, by="row.names", all = FALSE)
+write.csv(merge.contam, "./merge.contam.csv")
+
+#Remove blank samples
+blank <- c("Blank", "qblnk1", "qblnk2") 
+ps.clean <- prune_samples(!sample_names(ps.clean) %in% blank, ps.clean)
 
 #Presence/Absence Filtering
 BiocManager::install("genefilter")
 library(genefilter)
 library(vegan)
+microbe <- filter_taxa(ps.clean, filterfun(kOverA(2, 2)), TRUE) # New ps object
+
+ps.clean.sum <-sample_sums(ps.clean)
+microbe.sum <-sample_sums(microbe)
+filter1 <-microbe.sum/ps.clean.sum
+filterdf <- data.frame(filter1)
+
+#Merge taxonomy and ASV table
+taxtab.microbe <- data.frame(tax_table(microbe))
+seqtab.microbe <- data.frame(t(otu_table(microbe))) 
+merge.microbe <- merge(seqtab.microbe, taxtab.microbe, by="row.names", all = FALSE)
+write.csv(merge.microbe, "./merge.microbe.csv")
+
+
+############################# Old Code ######################################
 ##New
 ###k=2, A=2
 microbe1 <- filter_taxa(ps2, filterfun(kOverA(2, 2)), TRUE)
@@ -219,7 +249,7 @@ rarecurve(otu_table(microbe3), step=50, cex=0.5, label=FALSE)
 rarecurve(otu_table(ps1), step=50, cex=0.5, label=FALSE)
 
 
-###DON'T USE
+############################## DON'T USE ###################################
 #library(genefilter)
 ##k=2, A=0.001
 #microbe1 <- filter_taxa(ps1, filterfun(kOverA(2, 0.001)), TRUE)
