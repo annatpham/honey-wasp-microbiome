@@ -1,0 +1,258 @@
+---
+title: "Core Microbiome Analaysis"
+date: "2022-08-16"
+---
+
+Source: https://microbiome.github.io/tutorials/Core.html
+
+# Honey Wasp Only
+
+Perform core microbiome analysis on only the honey wasp samples.
+
+```{r}
+library(microbiome)
+
+# Calculate compositional version of the data (relative abundances)
+hw.rarefied <- subset_samples(ps.rarefied, Genus=="Brachygastra") 
+hw.rarefied.rel <- microbiome::transform(hw.rarefied, "compositional")
+
+# Formatting output for ps.rarefied.rel
+tax.rare <- as.data.frame(tax_table(hw.rarefied.rel))
+tax.rare$Sequence <- tax.rare$Genus # Changing sequences to genera to output ASVID:Genus
+tax_table(hw.rarefied.rel) <- as.matrix(tax.rare) # Replace with new taxonomy table
+View(hw.rarefied.rel@tax_table)
+
+# Modifying add_besthit function to remove domain info
+add_besthit <- function(x, sep=":"){
+  
+  Class<- Family<- Genus<- Genus.Species<- NULL
+  Order<- Phylum<- Species<-NULL
+  
+  x.nw <- x
+  if(length(rank_names(x.nw))== 6){
+    colnames(tax_table(x.nw)) <- c("Phylum", "Class", "Order", "Family", "Genus")
+  }
+  if(length(rank_names(x.nw))==7){
+    colnames(tax_table(x.nw)) <- c("Phylum", "Class", "Order", "Family", "Genus", "Species")
+  }
+  
+  tax.tib <- .get_taxa_tib_unite(x)
+  
+  tax.tib <- tax.tib %>% 
+    dplyr::mutate(Phylum =ifelse(is.na(Phylum), "Unclassifed", Phylum),
+                  Class =ifelse(is.na(Class), Phylum, Class),
+                  Order =ifelse(is.na(Order), Class, Order),
+                  Family =ifelse(is.na(Family), Order, Family),
+                  Genus =ifelse(is.na(Genus), Family, Genus)) 
+  if(length(rank_names(x))==7){
+    tax.tib <- tax.tib %>%
+      dplyr::mutate(Species =ifelse(is.na(Species), Genus, Species))
+  }
+  
+  best_hit <- paste0(taxa_names(x), sep,tax.tib[,ncol(tax.tib)])
+  
+  taxa_names(x) <- best_hit
+  return(x)
+}
+
+.get_taxa_tib_unite <- function(x){
+  
+  Genus<- Species <- Genus.Species<- NULL
+  tax.tib <- tax_table(x) %>% 
+    as.matrix() %>% 
+    as.data.frame() 
+  
+  #n.rk <- length(rank_names(x))
+  if(any(rank_names(x) == "Species") && any(rank_names(x) == "Genus")){
+    
+    tax.tib <- tax.tib %>% 
+      dplyr::mutate(Genus.Species = ifelse(!is.na(Species), 
+                                           paste0(Genus, ".", Species), Species)) %>%
+      dplyr::select(-Species) %>%
+      dplyr::rename(Species = Genus.Species)
+    
+  }
+  return(tax.tib)
+}
+
+library(dplyr)
+# New ps object with taxonomic identities of ASVs  
+hw.rarefied.rel.f <- add_besthit(hw.rarefied.rel, sep=": ")
+```
+
+# Prevalence of taxonomic groups
+
+```{r}
+# Relative population frequencies
+head(prevalence(hw.rarefied.rel.f, detection = 0, sort = TRUE))
+rel <- as.data.frame(prevalence(hw.rarefied.rel.f, detection = 0, sort = TRUE))
+
+# Absolute population frequencies (sample count)
+head(prevalence(hw.rarefied.rel.f, detection = 0, sort = TRUE, count = TRUE))
+rel2 <- as.data.frame(prevalence(hw.rarefied.rel.f, detection = 0, sort = TRUE, count = TRUE))
+
+merge.hw <- merge(rel, rel2, by="row.names", all = FALSE)
+
+
+#Adding read counts 
+tax.hw <- as.data.frame(tax_table(hw.rarefied))
+tax.hw$Sequence <- tax.hw$Genus # Changing sequences to genera to output ASVID:Genus
+tax_table(hw.rarefied) <- as.matrix(tax.hw) # Replace with new taxonomy table
+hw.rarefied <- add_besthit(hw.rarefied, sep=": ")
+
+otu.hw <- as.data.frame(t(otu_table(hw.rarefied)))
+otu.hw$Read <- rowSums(otu.hw[,c(-1)])
+otu.hw <- tibble::rownames_to_column(otu.hw, "row_names")
+merge.hw$Read <- otu.hw$Read[match(merge.hw$Row.names, otu.hw$row_names)] 
+write.csv(merge.hw, "./merge.hw.csv")
+
+# This returns core taxa (taxa that exceed the given prevalence and detection thresholds)
+core.taxa.standard <- core_members(hw.rarefied.rel.f, detection = 0, prevalence = 50/100)
+core.taxa.standard
+```
+
+# Core Visualization
+
+```{r}
+# Core with compositionals:
+library(RColorBrewer)
+detections <- round(10^seq(log10(1e-2), log10(.2), length = 10), 3)
+
+library(svglite)
+pcore.honey <- plot_core(hw.rarefied.rel.f, plot.type = "heatmap", 
+               prevalences = prevalences, detections = detections,
+               min.prevalence = .2, horizontal = FALSE, 
+               colours = c("#D5FFFF", "#00314D")) +
+  xlab("Detection Threshold (Relative Abundance (%))") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ggsave(file="corehoneywasp.svg", plot=pcore.honey, width=8, height=5)
+```
+
+# Other Wasps Together
+
+Perform core microbiome analysis on all wasps in the data set, except honey wasps.
+
+```{r}
+ps.other <- ps.rarefied
+ps.other <- prune_samples(sample_data(ps.other)$Wasp.Type == "Other Wasp", ps.other)
+View(ps.other@sam_data)
+ps.other.rel <- microbiome::transform(ps.other, "compositional")
+
+# Formatting output for ps.rarefied.rel
+tax.other <- as.data.frame(tax_table(ps.other.rel))
+tax.other$Sequence <- tax.other$Genus # Changing sequences to genera to output ASVID:Genus
+tax_table(ps.other.rel) <- as.matrix(tax.other) # Replace with new taxonomy table
+View(ps.other.rel@tax_table)
+
+library(dplyr)
+# New ps object with taxonomic identities of ASVs  
+ps.other.f <- add_besthit(ps.other.rel, sep=": ")
+
+library(microbiome)
+# Relative population frequencies; at 1% compositional abundance threshold
+head(prevalence(ps.other.f, detection = 0, sort = TRUE))
+
+# Absolute population frequencies (sample count)
+head(prevalence(ps.other.f, detection = 0, sort = TRUE, count = TRUE))
+
+# This returns core taxa (taxa that exceed the given prevalence and detection thresholds)
+core.taxa.standard <- core_members(ps.other.f, detection = 0, prevalence = 50/100)
+core.taxa.standard
+
+rel <- as.data.frame(prevalence(ps.other.f, detection = 0, sort = TRUE))
+rel2 <- as.data.frame(prevalence(ps.other.f, detection = 0, sort = TRUE, count = TRUE))
+
+merge.other <- merge(rel, rel2, by="row.names", all = FALSE)
+
+# Adding read counts to merged table
+tax.other <- as.data.frame(tax_table(ps.other))
+tax.other$Sequence <- tax.other$Genus # Changing sequences to genera to output ASVID:Genus
+tax_table(ps.other) <- as.matrix(tax.other) # Replace with new taxonomy table
+
+View(ps.other@tax_table)
+View(ps.other@otu_table)
+
+otu.other <- as.data.frame(t(otu_table(ps.other)))
+otu.other$Read <- rowSums(otu.other)
+otu.other <- tibble::rownames_to_column(otu.other, "row_names")
+merge.other$Read <- otu.other$Read[match(merge.other$Row.names, otu.other$row_names)] 
+write.csv(merge.other, "./merge.other.csv")
+
+### CORE HEATMAP ###
+detections <- round(10^seq(log10(1e-2), log10(.2), length = 10), 3)
+pcore.other <- plot_core(ps.other.f, plot.type = "heatmap", 
+               prevalences = prevalences, detections = detections,
+               min.prevalence = .2, horizontal = FALSE, 
+               colours = c("#D5FFFF", "#00314D")) +
+  xlab("Detection Threshold (Relative Abundance (%))") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+print(pcore.other)  
+ggsave(file="coreotherwasp.svg", plot=pcore.other, width=8, height=5)
+```
+
+# Polistes Only
+
+Perform core microbiome analysis on only the Polistes wasps.
+
+```{r}
+ps.pol <- ps.rarefied
+ps.pol <- prune_samples(sample_data(ps.pol)$Genus == "Polistes", ps.pol)
+View(ps.pol@sam_data)
+ps.pol.rel <- microbiome::transform(ps.pol, "compositional")
+
+# Formatting output for ps.rarefied.rel
+tax.pol <- as.data.frame(tax_table(ps.pol.rel))
+tax.pol$Sequence <- tax.pol$Genus # Changing sequences to genera to output ASVID:Genus
+tax_table(ps.pol.rel) <- as.matrix(tax.pol) # Replace with new taxonomy table
+View(ps.pol.rel@tax_table)
+
+library(dplyr)
+# New ps object with taxonomic identities of ASVs  
+ps.pol.f <- add_besthit(ps.pol.rel, sep=": ")
+
+library(microbiome)
+# Relative population frequencies
+head(prevalence(ps.pol.f, detection = 0, sort = TRUE))
+
+# Absolute population frequencies (sample count)
+head(prevalence(ps.pol.f, detection = 0, sort = TRUE, count = TRUE))
+
+# This returns core taxa (taxa that exceed the given prevalence and detection thresholds)
+core.taxa.standard <- core_members(ps.pol.f, detection = 0, prevalence = 50/100)
+core.taxa.standard
+
+rel <- as.data.frame(prevalence(ps.pol.f, detection = 0, sort = TRUE))
+rel2 <- as.data.frame(prevalence(ps.pol.f, detection = 0, sort = TRUE, count = TRUE))
+
+merge.pol <- merge(rel, rel2, by="row.names", all = FALSE)
+write.csv(merge.pol, "./merge.pol.csv")
+
+# Adding read counts to merged table
+tax.pol <- as.data.frame(tax_table(ps.pol))
+tax.pol$Sequence <- tax.pol$Genus # Changing sequences to genera to output ASVID:Genus
+tax_table(ps.pol) <- as.matrix(tax.pol) # Replace with new taxonomy table
+ps.pol <- add_besthit(ps.pol, sep=":")
+View(ps.other@tax_table)
+View(ps.other@otu_table)
+
+otu.pol <- as.data.frame(t(otu_table(ps.pol)))
+otu.pol$Read <- rowSums(otu.pol[,c(-1)])
+otu.pol <- tibble::rownames_to_column(otu.pol, "row_names")
+merge.pol$Read <- otu.pol$Read[match(merge.pol$Row.names, otu.pol$row_names)] 
+
+write.csv(merge.pol, "./merge.pol.csv")
+
+# Core with compositionals:
+detections <- round(10^seq(log10(1e-2), log10(.2), length = 10), 3)
+pcore.pol <- plot_core(ps.pol.f, plot.type = "heatmap", 
+               prevalences = prevalences, detections = detections,
+               min.prevalence = .2, horizontal = FALSE, 
+               colours = c("#D5FFFF", "#00314D")) +
+  xlab("Detection Threshold (Relative Abundance (%))") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+print(pcore.pol)  
+ggsave(file="corepolistes.svg", plot=pcore.pol, width=8, height=5)
+```
